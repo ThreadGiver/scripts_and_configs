@@ -97,36 +97,96 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
+# %B - bold start
+# %b - bold stop
+# %F - foreground color start
+# %f - color reset
+# %n - username
+# %m - hostname
+
+
+bright_red=9
+bright_yellow=11
+bright_blue=12
+bright_magenta=13
+bright_white=15
+
 configure_prompt() {
-    # prompt_symbol=㉿
-    # prompt_symbol=⚢\ 
-    # prompt_symbol=⚝\ 
-    prompt_symbol=⛧\ 
-    # prompt_symbol=⭗\ 
-    # prompt_symbol=⌽\ 
-    # prompt_symbol=⌬\ 
-    # prompt_symbol=㋛\ 
-    # prompt_symbol=🟇\ 
-    # prompt_symbol=🂽\ 
-    # Skull emoji for root termina
-    # Skull emoji for root terminal
-    #[ "$EUID" -eq 0 ] && prompt_symbol=💀
+    symbol=⛧\ 
+
+    col1=%F{magenta}
+    col2=%F{$bright_red}
+    chroot='debian_chroot:+($debian_chroot)'
+    venv='VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))'
     case "$PROMPT_ALTERNATIVE" in
         twoline)
-            PROMPT=$'%F{%(#.blue.green)}┌──${debian_chroot:+($debian_chroot)─}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))─}(%B%F{%(#.red.blue)}%n'$prompt_symbol$'%m%b%F{%(#.blue.green)})-[%B%F{reset}%(6~.%-1~/…/%4~.%5~)%b%F{%(#.blue.green)}]\n└─%B%(#.%F{red}#.%F{blue}$)%b%F{reset} '
+        	identity='%B'$col2'%n'$symbol'%m%b'
+        	path_data='%B%f%(6~.%-1~/…/%4~.%5~)%b'
+            line1=$col1'┌──${'$chroot'─}${'$venv'─}('$identity$col1')-['$path_data$col1']'
+            line2=$col1'└─%B'$col2'$%b%f '
+            
+            PROMPT=$line1$'\n'$line2
+            
             # Right-side prompt with exit codes and background processes
-            #RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
+            # RPROMPT=$'%(?.. %? %F{red}%B⨯%b%F{reset})%(1j. %j %F{yellow}%B⚙%b%F{reset}.)'
             ;;
         oneline)
-            PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{%(#.red.blue)}%n@%m%b%F{reset}:%B%F{%(#.blue.green)}%~%b%F{reset}%(#.#.$) '
-            RPROMPT=
+            PROMPT=$'${'$chroot$'}${'$venv$'}%B'$col2'%n@%m%b%F{reset}:%B'$col1$'%~%b%F{reset}%(#.#.$) '
+            RPROMPT='%t'
             ;;
         backtrack)
-            PROMPT=$'${debian_chroot:+($debian_chroot)}${VIRTUAL_ENV:+($(basename $VIRTUAL_ENV))}%B%F{red}%n@%m%b%F{reset}:%B%F{blue}%~%b%F{reset}%(#.#.$) '
+            PROMPT=$'${'$chroot$'}${'$venv$'}%B%F{red}%n@%m%b%F{reset}:%B%F{blue}%~%b%F{reset}%(#.#.$) '
             RPROMPT=
             ;;
     esac
     unset prompt_symbol
+}
+
+
+set_highlighting(){
+    . /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+    ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+    ZSH_HIGHLIGHT_STYLES[default]=none
+    ZSH_HIGHLIGHT_STYLES[unknown-token]=underline
+    ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
+    ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[global-alias]=fg=green,bold
+    ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
+    ZSH_HIGHLIGHT_STYLES[path]=bold
+    ZSH_HIGHLIGHT_STYLES[path_pathseparator]=
+    ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]=
+    ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=,bold
+    ZSH_HIGHLIGHT_STYLES[command-substitution]=none
+    ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[process-substitution]=none
+    ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
+    ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
+    ZSH_HIGHLIGHT_STYLES[back-quoted-argument-delimiter]=fg=,bold
+    ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
+    ZSH_HIGHLIGHT_STYLES[rc-quote]=fg=magenta
+    ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[assign]=none
+    ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
+    ZSH_HIGHLIGHT_STYLES[named-fd]=none
+    ZSH_HIGHLIGHT_STYLES[numeric-fd]=none
+    ZSH_HIGHLIGHT_STYLES[arg0]=fg=cyan
+    ZSH_HIGHLIGHT_STYLES[bracket-error]=fg=red,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-1]=fg=blue,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-2]=fg=green,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-3]=fg=magenta,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
+    ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
+    ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
 }
 
 # The following block is surrounded by two delimiters.
@@ -144,49 +204,7 @@ if [ "$color_prompt" = yes ]; then
 
     # enable syntax-highlighting
     if [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
-        . /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-        ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
-        ZSH_HIGHLIGHT_STYLES[default]=none
-        ZSH_HIGHLIGHT_STYLES[unknown-token]=underline
-        ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
-        ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
-        ZSH_HIGHLIGHT_STYLES[global-alias]=fg=green,bold
-        ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
-        ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
-        ZSH_HIGHLIGHT_STYLES[path]=bold
-        ZSH_HIGHLIGHT_STYLES[path_pathseparator]=
-        ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]=
-        ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[command-substitution]=none
-        ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[process-substitution]=none
-        ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=green
-        ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=green
-        ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
-        ZSH_HIGHLIGHT_STYLES[back-quoted-argument-delimiter]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
-        ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
-        ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
-        ZSH_HIGHLIGHT_STYLES[rc-quote]=fg=magenta
-        ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[assign]=none
-        ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
-        ZSH_HIGHLIGHT_STYLES[named-fd]=none
-        ZSH_HIGHLIGHT_STYLES[numeric-fd]=none
-        ZSH_HIGHLIGHT_STYLES[arg0]=fg=cyan
-        ZSH_HIGHLIGHT_STYLES[bracket-error]=fg=red,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-1]=fg=blue,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-2]=fg=green,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-3]=fg=magenta,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
-        ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
-        ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
+        set_highlighting
     fi
 else
     PROMPT='${debian_chroot:+($debian_chroot)}%n@%m:%~%(#.#.$) '
@@ -276,3 +294,24 @@ fi
 # custom aliases
 alias py='python3'
 alias python='python3'
+alias mi='micro'
+alias update="echo 'Updating yay packages'; yay --noconfirm; echo 'Updating tldr pages'; tldr -u"
+
+
+# PROMPT='%m%# '
+# RPROMPT=
+
+# . "$HOME/.local/bin/env"
+
+# start ssh agent
+# export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent.socket
+# 
+# if ! pgrep -u "$USER" ssh-agent > /dev/null; then
+# 	echo starting ssh-agent
+#     ssh-agent > "$XDG_RUNTIME_DIR/ssh-agent.env"
+# fi
+# if [ ! -f "$SSH_AUTH_SOCK" ]; then
+#     source "$XDG_RUNTIME_DIR/ssh-agent.env" >/dev/null
+# fi
+
+export EDITOR=micro
