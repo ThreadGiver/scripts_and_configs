@@ -1,0 +1,28 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+  	"source": "\u001b[?25l\u001b[0m\u001b[38;2;211;47;0m                  -`\n                 .o+`\n                `ooo/\n               `+oooo:\n\u001b[38;2;255;158;93m              `+oooooo:\n             -+oooooo+:\n            `/:-:++oooo+:\n           `/++++/+++++++:\n\u001b[38;2;255;255;255m          `/++++++++++++++:\n         `/+++ooooooooooooo/`\n        ./ooosssso++osssssso+`\n       .oossssso-````/ossssss+`\n\u001b[38;2;211;100;165m      -osssssso.      :ssssssso.\n     :osssssss/        osssso+++.\n    /ossssssss/        +ssssooo/-\n  `/ossssso+/:-        -:/+osssso+-\n\u001b[38;2;162;2;101m `+sso+:-`                 `.-/+oso:\n`++:.                           `-/+/\n.`                                 `/\u001b[0m\u001b[?25h",
+  	"type": "data-raw"
+  },
+  "modules": [
+    "os",
+    "kernel",
+    "uptime",
+    "packages",
+    "shell",
+    "de",
+    "terminal",
+    "memory",
+    {
+    	"type": "battery",
+    	"key": "Battery"
+    },
+    "break",
+    {
+    	"type": "datetime",
+    	"key": "Time",
+    	"format": "{14}h{17}"
+    },
+    "colors"
+  ]
+}

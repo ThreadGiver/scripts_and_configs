@@ -315,3 +315,5 @@ alias update="echo 'Updating yay packages'; yay --noconfirm; echo 'Updating tldr
 # fi
 
 export EDITOR=micro
+
+fastfetch --color magenta
